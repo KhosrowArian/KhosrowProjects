@@ -1,0 +1,289 @@
+package processor;
+import java.util.*;
+
+public class Main {
+    
+    static Scanner scan = new Scanner(System.in);
+    
+    public static void main(String[] args) {
+        boolean status;
+        do {
+            status = writeAction();
+        }
+        while (status);
+    }
+    
+    static boolean writeAction() {
+        int choice = scan.nextInt();
+        
+        switch (choice) {
+            case 1:
+                addMatrix();
+                break;
+            case 2:
+                multiplyMatrixByConstant();
+                break;
+            case 3:
+                multiplyMatrix();
+                break;
+            case 4:
+                TransposeMatrix transpose = new TransposeMatrix();
+                transpose.operate();
+                break;
+            case 5:
+                FindDeterminant determinant = new FindDeterminant();
+                determinant.operate();
+                break;
+            case 6:
+                inverseMatrix();
+                break;
+            default:
+                return false;
+        }
+        return true;
+    }
+    
+    static void addMatrix() {
+        int row1 = scan.nextInt();
+        int col1 = scan.nextInt();
+        double[][] first = makeMatrix(row1, col1);
+        
+        int row2 = scan.nextInt();
+        int col2 = scan.nextInt();
+        double[][] second = makeMatrix(row2, col2);
+        
+        if ( row2 == row1 && col2 == col1) {
+            double[][] result = new double[row2][col2];
+            for (int i = 0; i < row2; i++) {
+                for (int j = 0; j < col2; j++) {
+                    result[i][j] = first[i][j] + second[i][j];
+                }
+            }
+            printMatrix(result, row1, col1);
+            
+        } else {
+            System.out.println("ERROR");
+        }
+    }
+    
+    static void multiplyMatrix() {
+        int row1 = scan.nextInt();
+        int col1 = scan.nextInt();
+        double[][] first = makeMatrix(row1, col1);
+        
+        int row2 = scan.nextInt();
+        int col2 = scan.nextInt();
+        double[][] second = makeMatrix(row2, col2);
+        
+        if (row2 == col1) {
+            double[][] c =new double[row1][col2];
+            for(int i = 0; i < row1; i++){
+                for(int j = 0; j < col2; j++){
+                    c[i][j] = 0;
+                    for (int k = 0; k < col1; k++){
+                        c[i][j] += first[i][k] * second[k][j];
+                    }
+                    System.out.print(c[i][j] + " ");  //printing matrix element
+                }
+                System.out.println();
+            }
+        } else {
+            System.out.println("ERROR");
+        }
+    }
+    
+    static void multiplyMatrixByConstant() {
+        int row = scan.nextInt();
+        int column = scan.nextInt();
+        double[][] matrix = makeMatrix(row, column);
+        
+        double scalar = scan.nextDouble();
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < column; j++) {
+                matrix[i][j] = matrix[i][j] * scalar;
+            }
+        }
+        printMatrix(matrix, row, column);
+    }
+    
+    static class TransposeMatrix {
+        void operate() {
+            int type = scan.nextInt();
+            switch (type) {
+                case 1:
+                    mainDiagonalT();
+                    break;
+                case 2:
+                    sideDiagonalT();
+                    break;
+                case 3:
+                    verticalLineT();
+                    break;
+                case 4:
+                    horizontalLineT();
+            }
+        }
+        
+        void mainDiagonalT() {
+            int row = scan.nextInt();
+            int column = scan.nextInt();
+            double[][] matrix = makeMatrix(row, column);
+        
+            double[][] newMatrix = new double[row][column];
+            for (int i = 0; i  < row; i++) {
+                for (int j = 0; j < column; j++) {
+                    newMatrix[i][j] = matrix[j][i];
+                }
+            }
+            printMatrix(newMatrix, row, column);
+        }
+        
+        void sideDiagonalT() {
+            int row = scan.nextInt();
+            int column = scan.nextInt();
+            double[][] matrix = makeMatrix(row, column);
+        
+            for (int i = 0; i  < row - 1; i++) {
+                for (int j = 0; j < column - i - 1; j++) {
+                    double current = matrix[j][i];
+                    matrix[j][i] = matrix[row - 1 - i][column - 1 - j];
+                    matrix[row - 1 - i][column - 1 - j] = current;
+                }
+            }
+            printMatrix(matrix, row, column);
+        }
+        
+        void verticalLineT() {
+            int row = scan.nextInt();
+            int column = scan.nextInt();
+            double[][] matrix = makeMatrix(row, column);
+        
+            double[][] newMatrix = new double[row][column];
+            for (int i = 0; i  < row; i++) {
+                for (int j = 0; j < column; j++) {
+                    newMatrix[i][j] = matrix[i][column - j - 1];
+                }
+            }
+            printMatrix(newMatrix, row, column);
+        }
+        
+        void horizontalLineT() {
+            int row = scan.nextInt();
+            int column = scan.nextInt();
+            double[][] matrix = makeMatrix(row, column);
+        
+            double[][] newMatrix = new double[row][column];
+            for (int i = 0; i  < row; i++) {
+                for (int j = 0; j < column; j++) {
+                    newMatrix[i][j] = matrix[row - i - 1][j];
+                }
+            }
+            printMatrix(newMatrix, row, column);
+        }
+    }
+    
+    static class FindDeterminant {
+        void operate() {
+            int row = scan.nextInt();
+            int column = scan.nextInt();
+            double[][] matrix = makeMatrix(row, column);
+            double answer = determinant(matrix, row, column);
+            System.out.println(answer);
+        }
+        
+        static void cofactor(double[][] matrix, double[][] minor, int m, int n, int row, int column) {
+            int currentRow = 0;
+            int currentColumn = 0;
+    
+            for (int i = 0; i < row; i++) {
+                for (int j = 0; j < column; j++) {
+                    if (i != m && j != n) {
+                        minor[currentRow][currentColumn++] = matrix[i][j];
+                        if (currentColumn == column - 1) {
+                            currentColumn = 0;
+                            currentRow++;
+                        }
+                    }
+                }
+            }
+        }
+        
+        double determinant(double[][] matrix, int row, int column) {
+            double det = 0;
+            double[][] minor = new double[row][column];
+            int sign = 1;
+        
+            if (row == 1) {
+                return matrix[0][0];
+            }   
+        
+            for (int i = 0; i < column; i++) {
+                cofactor(matrix, minor, 0, i, row, column);
+                det += sign * matrix[0][i] * determinant(minor, row - 1, column - 1);
+                sign = -sign;
+            }
+            return det;
+        }
+    }
+    
+    static void inverseMatrix() {
+        int row = scan.nextInt();
+        int column = scan.nextInt();
+        double[][] minor = new double[row][column];
+        double[][] matrix = makeMatrix(row, column);
+        
+        FindDeterminant Deter = new FindDeterminant();
+        double det = Deter.determinant(matrix, row, column);
+        
+        double[][] newMatrix = new double[row][column];
+        for (int i = 0; i  < row; i++) {
+            for (int j = 0; j < column; j++) {
+                newMatrix[i][j] = matrix[j][i];
+            }
+        }
+        
+        int sign = 1;
+        double[][] adjugate = new double[row][column];
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < column; j++) {
+                Deter.cofactor(newMatrix, minor, i, j, row, column);
+                adjugate[i][j] =Deter.determinant(minor, row - 1, column - 1);
+            }
+            
+        }
+        
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < column; j++) {
+                if ((i + j) % 2 != 0) {
+                    sign = -1;
+                } else {
+                    sign = 1;
+                }
+                adjugate[i][j] = sign * adjugate[i][j] * Math.abs(1 / det);
+                
+            }
+        }
+        printMatrix(adjugate, row, column);
+    }
+    
+    static double[][] makeMatrix(int row, int col) {
+        double[][] matrix = new double[row][col];
+
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < col; j++) {
+                matrix[i][j] = scan.nextDouble();
+            }
+        }
+        return matrix;
+    }
+    
+    static void printMatrix(double[][] matrix, int row, int column) {
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < column; j++) {
+                System.out.print(matrix[i][j] + " ");
+            }
+            System.out.println();
+        }
+    }
+    
+}
