@@ -1,0 +1,143 @@
+package tictactoe;
+import java.util.Scanner;
+
+public class Main {
+    
+    static Scanner scan = new Scanner(System.in);
+    static char[][] matrix = new char[3][3];
+    static int emptyCount = 9;
+    private int placeColumn;
+    private int placeRow;
+    private int cor1;
+    private int cor2;
+    private int xCount;
+    private int oCount;
+    private int xWins;
+    private int oWins;
+    
+    public static void main(String[] args) {
+        
+        System.out.println("---------");
+        System.out.println("| " + "_" + " " + "_" + " " + "_" + " |");
+        System.out.println("| " + "_" + " " + "_" + " " + "_" + " |");
+        System.out.println("| " + "_" + " " + "_" + " " + "_" + " |");
+        System.out.println("---------");
+        
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                matrix[i][j] = '_';
+            }
+        }
+        
+        Main main = new Main();
+        main.writeActionX();
+    }
+    
+    private void writeActionX(){
+        System.out.print("Enter the coordinates: ");
+        try{
+            placeColumn = Integer.parseInt(scan.next());
+            placeRow = Integer.parseInt(scan.next());
+        }catch (NumberFormatException ex) {
+            System.out.println("You should enter numbers!");
+        }
+        cor1 = 3 - placeRow;
+        cor2 = placeColumn - 1;
+        if (cor1 >=0 && cor1 <=2 && cor2 >=0 && cor2 <=2 && matrix[cor1][cor2] == '_') {
+            matrix[cor1][cor2] = 'X';
+            System.out.println("---------");
+            System.out.println("| " + matrix[0][0] + " " + matrix[0][1] + " " + matrix[0][2] + " |");
+            System.out.println("| " + matrix[1][0] + " " + matrix[1][1] + " " + matrix[1][2] + " |");
+            System.out.println("| " + matrix[2][0] + " " + matrix[2][1] + " " + matrix[2][2] + " |");
+            System.out.println("---------");
+            emptyCount--;
+            GameState();
+            if (emptyCount > 0 && xWins == 0 && oWins == 0) {
+                writeActionO();
+            }
+        } else if (!(cor1 >=0 && cor1 <=2 && cor2 >=0 && cor2 <=2)) {
+            System.out.println("Coordinates should be from 1 to 3!");
+            writeActionX();
+        } else if (cor1 >=0 && cor1 <=2 && cor2 >=0 && cor2 <=2 && matrix[cor1][cor2] != '_') {
+            System.out.println("This cell is occupied! Choose another one!");
+            writeActionX();
+        }
+    }
+    
+    private void writeActionO(){
+        System.out.print("Enter the coordinates: ");
+        try{
+            placeColumn = Integer.parseInt(scan.next());
+            placeRow = Integer.parseInt(scan.next());
+        }catch (NumberFormatException ex) {
+            System.out.println("You should enter numbers!");
+        }
+        cor1 = 3 - placeRow;
+        cor2 = placeColumn - 1;
+        if (cor1 >=0 && cor1 <=2 && cor2 >=0 && cor2 <=2 && matrix[cor1][cor2] == '_') {
+            matrix[cor1][cor2] = 'O';
+            System.out.println("---------");
+            System.out.println("| " + matrix[0][0] + " " + matrix[0][1] + " " + matrix[0][2] + " |");
+            System.out.println("| " + matrix[1][0] + " " + matrix[1][1] + " " + matrix[1][2] + " |");
+            System.out.println("| " + matrix[2][0] + " " + matrix[2][1] + " " + matrix[2][2] + " |");
+            System.out.println("---------");
+            emptyCount--;
+            GameState();
+            if (emptyCount > 0 && xWins ==0 && oWins == 0) {
+                writeActionX();
+            }
+        } else if (!(cor1 >=0 && cor1 <=2 && cor2 >=0 && cor2 <=2)) {
+            System.out.println("Coordinates should be from 1 to 3!");
+            writeActionO();
+        } else if (cor1 >=0 && cor1 <=2 && cor2 >=0 && cor2 <=2 && matrix[cor1][cor2] != '_') {
+            System.out.println("This cell is occupied! Choose another one!");
+            writeActionO();
+        }
+    }
+    
+    private void GameState() {
+        for (int i =0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                switch (matrix[i][j]) {
+                    case 'X':
+                        xCount++;
+                        break;
+                    case 'O':
+                        oCount++;
+                        break;
+                }
+            }
+        }
+
+        int rowCount = 0;
+        int columnCount = 0;
+        int rightToLeft = 0;
+        int leftToRight = 0;
+
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                rowCount += matrix[i][j];
+                columnCount += matrix[j][i];
+                if (i == j) {
+                    leftToRight += matrix[i][j];
+                }
+                if (i + j == 2) {
+                    rightToLeft += matrix[i][j];
+                }
+            }
+            if (columnCount == 264 || rowCount == 264 || rightToLeft == 264 || leftToRight == 264) {
+                xWins++;
+                System.out.println("X wins");
+            } else if (columnCount == 237 || rowCount == 237 || rightToLeft == 237 || leftToRight == 237) {
+                oWins++;
+                System.out.println("O wins");
+            }
+            if (emptyCount == 0 && xWins == 0 && oWins == 0) {
+                System.out.println("Draw");
+            }
+            rowCount = 0;
+            columnCount = 0;
+        }
+    }
+    
+} 
