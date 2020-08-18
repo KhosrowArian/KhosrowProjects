@@ -1,0 +1,85 @@
+package encryptdecrypt;
+
+import java.io.IOException;
+import java.io.PrintStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+public class Main {
+    static String mode = "enc";
+    static String in = null;
+    static String out = null;
+    static int key = 0;
+    static String data = "";
+    static String algMode = "shift";
+
+
+    public static void main(String[] args) throws IOException {
+
+        for (int i = 0; i < args.length; i++) {
+            switch (args[i]) {
+                case "-mode":
+                    mode = args[++i];
+                    break;
+                case "-key":
+                    key = Integer.parseInt(args[++i]);
+                    break;
+                case "-data":
+                    data = args[++i];
+                    break;
+                case "-in":
+                    in = args[++i];
+                    break;
+                case "-out":
+                    out = args[++i];
+                    break;
+                case "-alg":
+                    algMode = args[++i];
+            }
+        }
+
+        if (algMode.equals("unicode")) {
+            if ("dec".equals(mode))
+                key = -key;
+
+            if (data.equals("") && in != null) {
+                data = Files.readString(Path.of(in));
+            }
+
+            PrintStream printStream = out == null ? System.out : new PrintStream(out);
+
+            for (char c : data.toCharArray()) {
+                c = (char) (c + key);
+                printStream.print(c);
+            }
+        } else if (algMode.equals("shift")) {
+
+            if (data.equals("") && in != null) {
+                data = Files.readString(Path.of(in));
+            }
+
+            PrintStream printStream = out == null ? System.out : new PrintStream(out);
+
+            if ("dec".equals(mode)) {
+                for (char c : data.toCharArray()) {
+                    if (c >= 'a' && c <= 'z') {
+                        c = (char) ('z' - ('z' - c + (key % 26)) % 26);
+                    } else if (c >= 'A' && c <= 'Z') {
+                        c = (char) ('Z' - (('Z' - c + (key % 26)) % 26));
+                    }
+                    printStream.print(c);
+                }
+            } else if ("enc".equals(mode)) {
+                for (char c : data.toCharArray()) {
+                    if (c >= 'a' && c <= 'z') {
+                        c = (char) (((c - 'a' + (key % 26)) % 26) + 'a');
+                    } else if (c >= 'A' && c <= 'Z') {
+                        c = (char) (((c - 'A' + (key % 26)) % 26) + 'A');
+                    }
+                    printStream.print(c);
+                }
+            }
+        }
+    }
+
+}
