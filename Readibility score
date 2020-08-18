@@ -1,0 +1,109 @@
+package readability;
+import java.util.*;
+import java.lang.Math;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+public class Main {
+    public static void main(String[] args) throws IOException {
+        Scanner scan = new Scanner(System.in);
+        String in = args[0];
+        String line = Files.readString(Path.of(in));
+        
+        double wordNum = line.split("\\s+").length;
+        double sentenceNum = line.split("[.!?]+").length;
+        double characterNum = line.split("").length - wordNum + 1;
+        double syllNum = 0;
+        for (String word: line.split("\\s+")) {
+            syllNum += countSyllables(word);
+        }
+        double polySyllNum = 0;
+        for (String word: line.split("\\s+")) {
+            if (countSyllables(word) > 2) {
+                polySyllNum++;
+            }
+        }
+
+        double Lnum = characterNum / wordNum * 100;
+        double Snum = sentenceNum / wordNum * 100;
+        double ARIScore = 4.71 * characterNum / wordNum + 0.5 * wordNum / sentenceNum - 21.43;
+        double FKrtScore = 0.39 * wordNum / sentenceNum + 11.8 * syllNum / wordNum - 15.59;
+        double SMGScore = 1.043 * Math.sqrt(polySyllNum * 30 / sentenceNum) + 3.1291;
+        double CLScore = 0.0588 * Lnum - 0.296 * Snum - 15.8;
+        double averageOfFour = 1 / 4 * (returnScore(ARIScore) + returnScore(FKrtScore) + returnScore(SMGScore) + returnScore(CLScore));
+        
+        
+        System.out.println("Words: " + wordNum);
+        System.out.println("Sentences: " + sentenceNum);
+        System.out.println("Characters: " + characterNum);
+        System.out.println("Syllables: " + syllNum);
+        System.out.println("Polysyllables: " + polySyllNum);
+        System.out.println("Enter the score you want to calculate (ARI, FK, SMOG, CL, all): ");
+        String type = scan.next();
+        
+        switch (type) {
+            case "ARI":
+                System.out.print("Automated Readability Index: " + ARIScore + " ");
+                System.out.println("(about " + returnScore(ARIScore) + " year olds).");
+                break;
+            case "FK":
+                System.out.print("Flesch–Kincaid readability tests: " + FKrtScore + " ");
+                System.out.println("(about " + returnScore(FKrtScore) + " year olds).");
+                break;
+            case "SMOG":
+                System.out.print("Simple Measure of Gobbledygook: " + SMGScore + " ");
+                System.out.println("(about " + returnScore(SMGScore) + " year olds).");
+                break;
+            case "CL":
+                System.out.print("Coleman–Liau index: " + CLScore + " ");
+                System.out.println("(about " + returnScore(CLScore) + " year olds).");
+                break;
+            case "all":
+                System.out.print("Automated Readability Index: " + ARIScore + " ");
+                System.out.println("(about " + returnScore(ARIScore) + " year olds).");
+                System.out.print("Flesch–Kincaid readability tests: " + FKrtScore + " ");
+                System.out.println("(about " + returnScore(FKrtScore) + " year olds).");
+                System.out.print("Simple Measure of Gobbledygook: " + SMGScore + " ");
+                System.out.println("(about " + returnScore(SMGScore) + " year olds).");
+                System.out.print("Coleman–Liau index: " + CLScore + " ");
+                System.out.println("(about " + returnScore(CLScore) + " year olds).");
+                System.out.println("This text should be understood in average by " + averageOfFour + " year olds.");   
+        }
+    }
+    
+    static int returnScore(double score) {
+        int result = (int) Math.floor(score);
+        if (result == 1 || result == 2) {
+            return result + 5;
+        } else if (3 <= result && result <= 12) {
+            return result + 6;
+        } else if (result == 13) {
+            return 24;
+        } else {
+            return 25;
+        }
+    }
+    
+    static int countSyllables(String word) {
+        int vowelNum = word.split("[aAeEiIoOuUyY]").length - 1;
+        boolean endL = word.endsWith("[aAiIoOuUyY]");
+        if (endL) {
+            vowelNum++;
+        }
+        
+        int doubleNum = word.split("[aAeEiIoOuUyY][aAeEiIoOuUyY]").length - 1;
+        boolean endLL = word.endsWith("[aAeEiIoOuUyY][aAiIoOuUyY]");
+        if (endLL) {
+            doubleNum++;
+        }
+        int syllableNum = vowelNum - doubleNum;
+        
+        if (vowelNum <= 0) {
+            return 1;
+        } else {
+            return syllableNum;
+        }
+    }
+}
