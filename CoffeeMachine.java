@@ -48,16 +48,12 @@ public class CoffeeMachine {
             case "fill":
                 System.out.println("");
                 System.out.println("Write how many ml of water do you want to add:");
-                //Scanner scan6 = new Scanner(System.in);
                 int num8 = scan.nextInt();
                 System.out.println("Write how many ml of milk do you want to add: ");
-                //Scanner scan6 = new Scanner(System.in);
                 int num9 = scan.nextInt();
                 System.out.println("Write how many grams of coffee beans do you want to add: ");
-                //Scanner scan6 = new Scanner(System.in);
                 int num10 = scan.nextInt();
                 System.out.println("Write how many disposable cups of coffee do you want to add:");
-                //Scanner scan6 = new Scanner(System.in);
                 int num11 = scan.nextInt();
                 fill(num8, num9, num10, num11);
                 break;
